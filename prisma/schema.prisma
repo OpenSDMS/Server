@@ -9,6 +9,56 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
+}
+
+
+model User {
+  id String @id
+  password String
+  name String
+  groupId String?
+
+  group Group? @relation(fields: [groupId], references: [id])
+}
+
+model Group {
+  id String @id
+  name String
+  user User[]
+}
+
+
+model Device {
+  id Int @id @default(autoincrement())
+  name String
+  model String?
+  rawFilePath String
+  modifiedReason String?
+  repositoryId Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  repository Repository? @relation(fields: [repositoryId], references: [id])
+}
+
+
+model Repository {
+  id Int @id @default(autoincrement())
+  name String
+  parentId Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  Device Device[]
+
+  parent    Repository?  @relation("RepositoryToRepository", fields: [parentId], references: [id])
+  children  Repository[] @relation("RepositoryToRepository")
+}
+
+
+model RepositoryAccessMap {
+  id Int @id @default(autoincrement())
+
 }
