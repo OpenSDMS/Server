@@ -1,10 +1,8 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
-import sign from '../middleware/sign';
 
 const router = express.Router();
 const prisma = new PrismaClient();
-
 
 interface RequestCreateDevice {
     name: string,
@@ -12,7 +10,6 @@ interface RequestCreateDevice {
     rawFilePath: string,
     model?: string,
 }
-
 
 router.get('/', async (request, response) => {
     let { deviceId }: any = request.query;
@@ -30,6 +27,8 @@ router.get('/', async (request, response) => {
         });
         return;
     }
+    
+
 
     response.json(await prisma.device.findFirst({
         where: {
@@ -43,9 +42,7 @@ router.post('/', async (request, response) => {
     const requestData: RequestCreateDevice = request.body;
 
     try {
-        const findDevice = await prisma.device.findFirst({
-            where: { name: requestData.name }
-        });
+        const findDevice = await prisma.device.findFirst({ where: { name: requestData.name } });
         
         if (findDevice) {
             response.status(400).json({
@@ -63,7 +60,6 @@ router.post('/', async (request, response) => {
                 model: requestData.model,
             }
         });
-    
         response.json(result);
     }
     catch (err) {
@@ -71,8 +67,6 @@ router.post('/', async (request, response) => {
             status: 'fail',
             result: 'PARAMETER_MALFORMED'
         });
-
-        console.log(err);
     }
 });
 

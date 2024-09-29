@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import express, { Request, Response } from 'express';
 import { query, body, validationResult } from 'express-validator';
+import { isAdmin, sign } from '../middleware/authentication';
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -19,8 +20,10 @@ const CREATE_VALIDATION = [
     body("parentId").optional({nullable: true}).isInt().withMessage("IS_NOT_NUMBER")
 ];
 
+
+
 // 특정 저장소 혹은 전체 저장소 조회
-router.get('/', GET_VALIDATION, async (request: Request, response: Response) => {
+router.get('/', sign, GET_VALIDATION, async (request: any, response: Response) => {
     const { repositoryId }: any = request.query;
 
     if (!repositoryId) {
@@ -46,7 +49,7 @@ router.get('/', GET_VALIDATION, async (request: Request, response: Response) => 
 
 
 // 저장소 생성
-router.post('/', CREATE_VALIDATION, async (request: Request, response: Response) => {
+router.post('/', sign, isAdmin, CREATE_VALIDATION, async (request: any, response: Response) => {
     const requestData: RequestCreateRepository = request.body;
 
     const errors = validationResult(request);

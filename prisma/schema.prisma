@@ -8,11 +8,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model User {
-  id        String @id
-  password  String
-  name      String
+  id            String @id
+  password      String
+  name          String
+  isAdmin       Boolean? @default(false)
+  isPasswordSet Boolean? @default(false)
   
   groups    UserGroupMap[]
 }
@@ -20,7 +21,7 @@ model User {
 model Group {
   id        String @id
   name      String
-
+  
   users       UserGroupMap[]
   permissions RepositoryPermissionMap[]
 }
