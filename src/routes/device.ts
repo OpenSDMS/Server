@@ -1,8 +1,10 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
+import sign from '../middleware/sign';
 
 const router = express.Router();
 const prisma = new PrismaClient();
+
 
 interface RequestCreateDevice {
     name: string,
