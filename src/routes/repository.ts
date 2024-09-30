@@ -1,7 +1,7 @@
-import { PrismaClient } from '@prisma/client';
-import express, { Request, Response } from 'express';
+import { PrismaClient }                  from '@prisma/client';
+import express, { Request, Response }    from 'express';
 import { query, body, validationResult } from 'express-validator';
-import { isAdmin, sign } from '../middleware/authentication';
+import { isAdmin, sign }                 from '../middleware/authentication';
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -21,7 +21,6 @@ const CREATE_VALIDATION = [
 ];
 
 
-
 // 특정 저장소 혹은 전체 저장소 조회
 router.get('/', sign, GET_VALIDATION, async (request: any, response: Response) => {
     const { repositoryId }: any = request.query;
@@ -29,7 +28,7 @@ router.get('/', sign, GET_VALIDATION, async (request: any, response: Response) =
     if (!repositoryId) {
         response.json(await prisma.repository.findMany());
         return;
-    }
+    }   
 
     const errors = validationResult(request);
     if (errors.isEmpty()) {
@@ -49,7 +48,7 @@ router.get('/', sign, GET_VALIDATION, async (request: any, response: Response) =
 
 
 // 저장소 생성
-router.post('/', sign, isAdmin, CREATE_VALIDATION, async (request: any, response: Response) => {
+router.post('/', isAdmin, CREATE_VALIDATION, async (request: any, response: Response) => {
     const requestData: RequestCreateRepository = request.body;
 
     const errors = validationResult(request);

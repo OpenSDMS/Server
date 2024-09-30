@@ -13,8 +13,8 @@ model User {
   password      String
   name          String
   isAdmin       Boolean? @default(false)
-  isPasswordSet Boolean? @default(false)
-  
+  isReset       Boolean? @default(true)
+
   groups    UserGroupMap[]
 }
 
@@ -27,7 +27,7 @@ model Group {
 }
 
 model UserGroupMap {
-  id        Int @id @default(autoincrement())
+  id        Int   @id @default(autoincrement())
   userId    String
   groupId   String
   
@@ -36,16 +36,16 @@ model UserGroupMap {
 }
 
 model Device {
-  id Int @id @default(autoincrement())
-  name String
-  model String?
-  rawFilePath String
-  modifiedReason String?
-  repositoryId Int?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  id              Int @id @default(autoincrement())
+  name            String
+  model           String?
+  rawFilePath     String
+  modifiedReason  String?
+  repositoryId    Int?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @default(now())
 
-  repository Repository? @relation(fields: [repositoryId], references: [id])
+  repository      Repository? @relation(fields: [repositoryId], references: [id])
 }
 
 

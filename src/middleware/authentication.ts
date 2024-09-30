@@ -3,9 +3,8 @@ import { NextFunction, Response } from "express";
 import jwt from 'jsonwebtoken';
 
 export function sign (request: any, response: Response, next: NextFunction) {
-    
     const authorization = request.header('Authorization');
-
+    
     if (!authorization) {
         response.status(401).json({
             status: 'fail',
@@ -27,7 +26,7 @@ export function sign (request: any, response: Response, next: NextFunction) {
     }
 }
 
-export function isAdmin (request: any, response: Response, next: NextFunction) {
+export function isAdmin (request: any, response: Response, next: NextFunction) {    
     if (!request.login.isAdmin) {
         response.status(401).json({
             status: 'fail',
