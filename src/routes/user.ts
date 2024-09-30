@@ -31,23 +31,12 @@ router.get('/', sign, isAdmin, GET_USER_VALIDATION, async (request: Request, res
 
 router.post('/', sign, isAdmin, CREATE_USER_VALIDATION, async (request: any, response: Response) => {
     const requestData: RequestCreateUser = request.body;
-
-    // 관리자 권한 확인
-    if (!request.login.isAdmin) {
-        response.status(400).json({
-            status: 'fail',
-            result: 'PERMISSION_DENY'
-        });
-
-        return;
-    }
-
     const result = await prisma.user.create({
         data: {
             id: requestData.id,
             password: "tmp1234",
             name: requestData.name,
-            isAdmin: request.isAdmin,
+            isAdmin: request.login.isAdmin,
         }
     });
 

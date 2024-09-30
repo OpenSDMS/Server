@@ -15,61 +15,54 @@ model User {
   isAdmin       Boolean? @default(false)
   isReset       Boolean? @default(true)
 
-  groups    UserGroupMap[]
-}
-
-model Group {
-  id        String @id
-  name      String
-  
-  users       UserGroupMap[]
-  permissions RepositoryPermissionMap[]
-}
-
-model UserGroupMap {
-  id        Int   @id @default(autoincrement())
-  userId    String
-  groupId   String
-  
-  user      User  @relation(fields: [userId],  references: [id])
-  group     Group @relation(fields: [groupId], references: [id])
+  permissions   RepositoryPermissionMap[] 
 }
 
 model Device {
-  id              Int @id @default(autoincrement())
-  name            String
+  name            String @id
   model           String?
   rawFilePath     String
-  modifiedReason  String?
   repositoryId    Int?
+
+  ips             DeviceIpMap[]
+  
   createdAt       DateTime @default(now())
   updatedAt       DateTime @default(now())
-
-  repository      Repository? @relation(fields: [repositoryId], references: [id])
 }
 
+model DeviceIpMap {
+  id        Int @id @default(autoincrement())
+  ip        String
+  deviceId  String
+  device    Device @relation(fields: [deviceId], references: [name])
+}
 
 model Repository {
   id        Int @id @default(autoincrement())
   name      String
+  desc      String
   parentId  Int?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
 
-  device      Device[]
   permissions RepositoryPermissionMap[]
 
-  parent    Repository?  @relation("RepositoryToRepository", fields: [parentId], references: [id])
-  children  Repository[] @relation("RepositoryToRepository")
+  parent      Repository?  @relation("RepositoryToRepository", fields: [parentId], references: [id])
+  children    Repository[] @relation("RepositoryToRepository")
 }
-
 
 model RepositoryPermissionMap {
   id            Int @id @default(autoincrement())
   repositoryId  Int
-  groupId       String
+  userId        String
   permission    String
 
   repository Repository @relation(fields: [repositoryId], references: [id])
-  group      Group      @relation(fields: [groupId],      references: [id])
+  user       User       @relation(fields: [userId],       references: [id])
+}
+
+model Logs {
+  id            Int @id @default(autoincrement())
+
 }

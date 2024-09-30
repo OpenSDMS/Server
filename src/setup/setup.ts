@@ -1,5 +1,6 @@
 
 import { PrismaClient } from "@prisma/client";
+import jwt from 'jsonwebtoken';
 
 const prisma = new PrismaClient();
 
@@ -8,12 +9,12 @@ const prisma = new PrismaClient();
 })();
 
 async function createRootUserIfNotExists () {
-    const findRootUser = await prisma.user.findUnique({
+    let root = await prisma.user.findUnique({
         where: { id: 'root' }  
     });
 
-    if (!findRootUser) {
-        await prisma.user.create({
+    if (!root) {
+        root = await prisma.user.create({
             data: {
                 id: 'root',
                 password: 'toor',
@@ -22,4 +23,7 @@ async function createRootUserIfNotExists () {
             }
         });
     }
+
+    // ADMIN TOKEN FOR TEST
+    console.log(jwt.sign(JSON.stringify({id: root.id, isAdmin: root.isAdmin}), process.env.SECRET_KEY as string));
 }

@@ -1,3 +1,0 @@
--- AlterTable
-ALTER TABLE `User` ADD COLUMN `isReset` BOOLEAN NULL DEFAULT true,
-    MODIFY `isAdmin` BOOLEAN NULL DEFAULT false;

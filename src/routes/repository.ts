@@ -24,26 +24,6 @@ const CREATE_VALIDATION = [
 // 특정 저장소 혹은 전체 저장소 조회
 router.get('/', sign, GET_VALIDATION, async (request: any, response: Response) => {
     const { repositoryId }: any = request.query;
-
-    if (!repositoryId) {
-        response.json(await prisma.repository.findMany());
-        return;
-    }   
-
-    const errors = validationResult(request);
-    if (errors.isEmpty()) {
-        response.status(400).json({
-            status: 'fail',
-            result: errors.array()
-        });
-        return;
-    }
-    
-    response.json(await prisma.device.findFirst({
-        where: {
-            id: repositoryId
-        }
-    }));
 });
 
 
@@ -72,15 +52,6 @@ router.post('/', isAdmin, CREATE_VALIDATION, async (request: any, response: Resp
             });
             return;
         }
-
-        const result = await prisma.repository.create({
-            data: {
-                name: requestData.name,
-                parentId: requestData.parentId
-            }
-        });
-
-        response.json(result);
     }
     catch {
         response.json({
