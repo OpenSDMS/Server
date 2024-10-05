@@ -8,6 +8,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum ObjectType {
+  DEVICE
+  REPOSITORY
+  RAWDATA
+}
+
 model User {
   id            String @id
   password      String
@@ -15,54 +21,12 @@ model User {
   isAdmin       Boolean? @default(false)
   isReset       Boolean? @default(true)
 
-  permissions   RepositoryPermissionMap[] 
+  createObjects ObjectMetaData[]
 }
 
-model Device {
-  name            String @id
-  model           String?
-  rawFilePath     String
-  repositoryId    Int?
-
-  ips             DeviceIpMap[]
-  
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @default(now())
-}
-
-model DeviceIpMap {
-  id        Int @id @default(autoincrement())
-  ip        String
-  deviceId  String
-  device    Device @relation(fields: [deviceId], references: [name])
-}
-
-model Repository {
-  id        Int @id @default(autoincrement())
-  name      String
-  desc      String
-  parentId  Int?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
-
-  permissions RepositoryPermissionMap[]
-
-  parent      Repository?  @relation("RepositoryToRepository", fields: [parentId], references: [id])
-  children    Repository[] @relation("RepositoryToRepository")
-}
-
-model RepositoryPermissionMap {
-  id            Int @id @default(autoincrement())
-  repositoryId  Int
-  userId        String
-  permission    String
-
-  repository Repository @relation(fields: [repositoryId], references: [id])
-  user       User       @relation(fields: [userId],       references: [id])
-}
-
-model Logs {
-  id            Int @id @default(autoincrement())
-
+model ObjectMetaData {
+  id             String @id
+  type           ObjectType
+  userId         String
+  user           User @relation(fields: [userId], references: [id])
 }
