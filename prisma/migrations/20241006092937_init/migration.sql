@@ -13,6 +13,7 @@ CREATE TABLE `User` (
 CREATE TABLE `ObjectMetaData` (
     `id` VARCHAR(191) NOT NULL,
     `type` ENUM('DEVICE', 'REPOSITORY', 'RAWDATA') NOT NULL,
+    `createdAt` VARCHAR(191) NOT NULL,
     `userId` VARCHAR(191) NOT NULL,
 
     PRIMARY KEY (`id`)
