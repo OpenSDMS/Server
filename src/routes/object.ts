@@ -1,7 +1,6 @@
 
 import express, { Request, Response } from 'express';
-import { createDevice, getDeivces, getDeviceItems } from '../services/DeviceService';
-import { objectValidation } from '../middleware/objectValidation';
+import { createDevice, getDeivces } from '../services/DeviceService';
 import { createRepository } from '../services/RepositoryService';
 import { PrismaClient } from '@prisma/client';
 import path from 'path';
@@ -30,17 +29,26 @@ router.get('/query', async (request: Request, response: Response) => {
 });
 
 
-router.get('/device', objectValidation, async (request: Request, response: Response) => {
+router.get('/device', async (request: Request, response: Response) => {
+    
+    const devices = (await getDeivces("root")).map(device => ({
+        id: device.id,
+        name: path.basename(device.id),
+        user: device.user.name,
+        createdAt: device.createdAt,
+        type: device.type
+    }));
+
     response.json({
         status: 'ok',
-        result: await getDeivces("root")
+        result: devices
     });
 });
 
 
 router.post('/device', async (request: Request, response: Response) => {
-    const requestData = request.body;
-    const object = await createDevice('root', requestData.name);
+    const { name } = request.body;
+    const object = await createDevice('root', name);
     response.json(object);
 });
 

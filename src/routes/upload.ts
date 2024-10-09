@@ -1,44 +1,70 @@
-import express, { Request, Response } from 'express';
-import { existsSync } from 'fs';
-import multer from 'multer';
-import path from 'path';
+
+import express  from 'express';
+import crypto   from 'crypto';
+import fs       from 'fs';
+import multer   from 'multer';
+import path     from 'path';
+import { PrismaClient } from '@prisma/client';
 
 const router = express.Router();
+const prisma = new PrismaClient();
+
 
 const storage = multer.diskStorage({
-    destination (req, file, callback) {
-        const { savePath } = req.body;
-
-        console.log(req);
-
-        if (!savePath) {
-            return callback(new Error("MARFORMED_PARAMETER"), "");
-        }
-
-        const fullPath = path.join(process.env.SDMS as string, savePath);
-
-        if (!existsSync(fullPath)) {
-            return callback(new Error("REPOSITORY_NOT_FOUND"), "");
-        }
-
-        callback(null, fullPath);
+    destination: (req, file, callback) => {
+        callback(null, process.env.TMP as string); 
     },
-    filename (req, file, callback) {
-        const { systemName, systemUserName, createdAt } = req.body;
-
-        if (!systemName || !systemUserName || !createdAt) {
-            return callback(new Error("MISSING_REQUIRED_FIELDS"), "");
-        }
-
-        callback(null, `${systemName}_${systemUserName}_${createdAt}`);
+    filename: (req, file, callback) => {
+        console.log(`${crypto.randomBytes(16).toString('hex')}${path.extname(file.originalname)}`);
+        callback(null, `${crypto.randomBytes(16).toString('hex')}${path.extname(file.originalname)}`);
     }
 });
 
+
 const upload = multer({ storage });
-router.post('/', upload.any(), async (req: Request, res: Response) => {
+router.post('/', upload.single("file"), async (req: any, res: any) => {
+    const file = req.file;
+    const { systemName, systemUserName, createdAt, savePath } = req.body;
+
+    if (!file || !systemName || !systemUserName || !createdAt) {
+        return res.status(400).json({
+            status: 'error',
+            message: 'Missing file or required fields'
+        });
+    }
+
+    const newFileName = `${systemName}_${systemUserName}_${createdAt}${path.extname(file.originalname)}`;
+    const repositoryPath = path.join(process.env.SDMS as string, savePath);
+
+    const findRepository = await prisma.objectMetaData.findUnique({
+        where: { id: savePath }
+    });
+
+    if (!fs.existsSync(repositoryPath) || !findRepository) {
+        return res.status(400).json({
+            status: 'fail',
+            result: 'REPOSITORY_NOT_FOUND'
+        });
+    }
+
+    if (findRepository.type !== "REPOSITORY") {
+        return res.status(400).json({
+            status: 'fail',
+            result: `${savePath}_IS_NOT_REPOSITORY`
+        });
+    }
+    
+    fs.rename(file.path, path.join(repositoryPath, newFileName), (err) => {
+        if (err) {
+            console.log(err);
+            return;
+        }
+        console.log(`saveRawdata=${path.join(repositoryPath, newFileName)}`);
+    });
+
     res.json({
-        status: "ok",
-        result: "OK"
+        status: 'ok',
+        message: 'File and data uploaded successfully'
     });
 });
 

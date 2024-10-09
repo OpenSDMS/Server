@@ -4,11 +4,7 @@ import fs from 'fs';
 import path from 'path';
 
 const ROOT = process.env.SDMS || "/";
-
-const prisma = new PrismaClient({
-    log: ['query']
-});
-
+const prisma = new PrismaClient({ log: ['query'] });
 
 export async function createDevice (userId: string, name: string) {
     const fullPath = path.join(ROOT, name);
@@ -22,13 +18,11 @@ export async function createDevice (userId: string, name: string) {
                 type: "DEVICE",
             }
         });
+        
         return resultMetadata;
     }
     catch {
-        if (fs.existsSync(fullPath)) {
-            fs.rmdirSync(fullPath);
-        }
-
+        if (fs.existsSync(fullPath)) { fs.rmdirSync(fullPath); }
         throw new Error("CREATE_DEVICE_TRANSACTION_FAILED");
     }
 }
@@ -51,7 +45,7 @@ export async function getDeviceItems (userId: string, device: string) {
                 { id: { startsWith: path.join(ROOT, device, '/') }},
                 {
                     NOT: {
-                        id: { contains: path.join(ROOT, device, '/'), endsWith: '/'}
+                        id: { contains: path.join(ROOT, device, '/'), endsWith: '/' }
                     }
                 }
             ]
