@@ -6,20 +6,40 @@ import path from 'path';
 const ROOT = process.env.SDMS || "/";
 const prisma = new PrismaClient({ log: ['query'] });
 
-export async function createDevice (userId: string, name: string) {
+interface DeviceOptions {
+    ips: string[],
+    rawdataPath: string
+}
+
+export async function createDevice (userId: string, name: string, options: DeviceOptions) {
     const fullPath = path.join(ROOT, name);
+
+    console.log(options);
     
     try {
         fs.mkdirSync(fullPath);
-        const resultMetadata = await prisma.objectMetaData.create({
-            data: {
-                id: fullPath,
-                userId,
-                type: "DEVICE",
-            }
+
+        return await prisma.$transaction(async (tx) => {
+            const newObjectMetaData = await tx.objectMetaData.create({
+                data: {
+                    id: fullPath,
+                    userId,
+                    type: "DEVICE",
+                }
+            });
+
+            const newObjectMetaDataExtension = await tx.objectMetaDataExtention.create({
+                data: {
+                    objectMetaDataId: newObjectMetaData.id,
+                    rawDataPath: options.rawdataPath,
+                }
+            });
+            
+            const ips = options.ips.map(ip => ({ objectId: newObjectMetaData.id, host: ip }));
+            const newHostIps = await tx.hostIps.createMany({ data: ips });
+
+            return { newObjectMetaData, newObjectMetaDataExtension, newHostIps };
         });
-        
-        return resultMetadata;
     }
     catch {
         if (fs.existsSync(fullPath)) { fs.rmdirSync(fullPath); }

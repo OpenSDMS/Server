@@ -7,6 +7,7 @@ import cors    from 'cors';
 import loginRouter  from './routes/login';
 import objectRouter from './routes/object';
 import uploadRouter from './routes/upload';
+import agentRouter  from './routes/agent';
 
 const app = express();
 
@@ -17,6 +18,8 @@ app.use(express.urlencoded({extended: true}));
 app.use('/api/upload', uploadRouter);
 app.use('/api/login',  loginRouter);
 app.use('/api/object', objectRouter);
+app.use('/api/agent',  agentRouter);
+
 
 app.listen(10001, () => {
   console.log("server is running on 10001");

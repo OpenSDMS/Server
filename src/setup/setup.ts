@@ -12,7 +12,7 @@ async function createRootUserIfNotExists () {
     let root = await prisma.user.findUnique({
         where: { id: 'root' }  
     });
-
+    
     if (!root) {
         root = await prisma.user.create({
             data: {

@@ -29,5 +29,23 @@ model ObjectMetaData {
   type           ObjectType
   userId         String
   createdAt      DateTime? @default(now())
+  ips            HostIps[]
+  metaAdditional ObjectMetaDataExtention?
+
   user           User @relation(fields: [userId], references: [id])
+}
+
+model ObjectMetaDataExtention {
+  id                Int @id @default(autoincrement())
+  objectMetaDataId  String @unique
+  rawDataPath       String
+  objectMetaData    ObjectMetaData @relation(fields: [objectMetaDataId], references: [id])
+}
+
+model HostIps {
+  id             Int @id @default(autoincrement())
+  host           String
+  objectId       String
+
+  object         ObjectMetaData @relation(fields: [objectId], references: [id])
 }

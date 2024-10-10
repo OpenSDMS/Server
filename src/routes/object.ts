@@ -1,23 +1,23 @@
 
 import express, { Request, Response } from 'express';
-import { createDevice, getDeivces } from '../services/DeviceService';
-import { createRepository } from '../services/RepositoryService';
-import { PrismaClient } from '@prisma/client';
-import path from 'path';
+import { createDevice, getDeivces }   from '../services/DeviceService';
+import { createRepository }           from '../services/RepositoryService';
+import { PrismaClient }               from '@prisma/client';
+import path                           from 'path';
 
 const router = express.Router();
 const prisma = new PrismaClient();
 
 
-router.get('/query', async (request: Request, response: Response) => {
+router.get('/', async (request: Request, response: Response) => {
     const ROOT = process.env.SDMS as string;
-    const { target } = request.query;
+    const { query } = request.query;
 
     const result = await prisma.objectMetaData.findMany({
         where: {
             AND: [
-                { id:  { startsWith: path.join(ROOT, target as string, '/') } },
-                { NOT: { id: { contains: path.join(ROOT, target as string, '/'), endsWith: '/'} } }
+                { id:  { startsWith: path.join(ROOT, query as string, '/') } },
+                { NOT: { id: { contains: path.join(ROOT, query as string, '/'), endsWith: '/'} } }
             ]
         }
     }); 
@@ -30,7 +30,6 @@ router.get('/query', async (request: Request, response: Response) => {
 
 
 router.get('/device', async (request: Request, response: Response) => {
-    
     const devices = (await getDeivces("root")).map(device => ({
         id: device.id,
         name: path.basename(device.id),
@@ -47,8 +46,8 @@ router.get('/device', async (request: Request, response: Response) => {
 
 
 router.post('/device', async (request: Request, response: Response) => {
-    const { name } = request.body;
-    const object = await createDevice('root', name);
+    const { name, rawdataPath, ips } = request.body;
+    const object = await createDevice('root', name, {ips, rawdataPath});
     response.json(object);
 });
 
