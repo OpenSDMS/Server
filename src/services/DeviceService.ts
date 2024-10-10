@@ -27,7 +27,7 @@ export async function createDevice (userId: string, name: string, options: Devic
                     type: "DEVICE",
                 }
             });
-
+            
             const newObjectMetaDataExtension = await tx.objectMetaDataExtention.create({
                 data: {
                     objectMetaDataId: newObjectMetaData.id,
