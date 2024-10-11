@@ -6,6 +6,7 @@ import path from 'path';
 const ROOT   = process.env.SDMS || "/";
 const prisma = new PrismaClient();
 
+
 export async function createRepository (userId: string, destination: string, objectName: string) {
     let fullPath = path.join(ROOT, destination);
 
@@ -16,7 +17,6 @@ export async function createRepository (userId: string, destination: string, obj
     fullPath = path.join(ROOT, destination, objectName);
     try {
         fs.mkdirSync(fullPath);
-            
         const resultMetadata = await prisma.objectMetaData.create({
             data: {
                 id: fullPath,

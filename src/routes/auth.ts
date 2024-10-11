@@ -1,12 +1,11 @@
 
 import express, { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
-import { body, validationResult } from 'express-validator';
+import { PrismaClient }               from '@prisma/client';
+import { body, validationResult }     from 'express-validator';
 import jwt from 'jsonwebtoken';
 
 const router = express.Router();
 const prisma = new PrismaClient();
-
 
 interface RequestLoginData {
     id: string,
@@ -28,7 +27,7 @@ router.post('/', LOGIN_VALIDATION, async (request: Request, response: Response) 
         });
         return;
     }
-
+    
     const requestData: RequestLoginData = request.body;
     const findUser = await prisma.user.findFirst({
         where: {

@@ -3,13 +3,14 @@ import { PrismaClient } from '@prisma/client';
 import fs from 'fs';
 import path from 'path';
 
-const ROOT = process.env.SDMS || "/";
+const ROOT   = process.env.SDMS || "/";
 const prisma = new PrismaClient({ log: ['query'] });
 
 interface DeviceOptions {
     ips: string[],
     rawdataPath: string
 }
+
 
 export async function createDevice (userId: string, name: string, options: DeviceOptions) {
     const fullPath = path.join(ROOT, name);
@@ -47,6 +48,7 @@ export async function createDevice (userId: string, name: string, options: Devic
     }
 }
 
+
 export async function getDeivces (userId: string) {
     return await prisma.objectMetaData.findMany({
         where: {
@@ -57,6 +59,7 @@ export async function getDeivces (userId: string) {
         }
     });
 }
+
 
 export async function getDeviceItems (userId: string, device: string) {
     return await prisma.objectMetaData.findMany({
