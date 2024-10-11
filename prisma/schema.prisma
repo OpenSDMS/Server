@@ -36,7 +36,7 @@ model ObjectMetaData {
 }
 
 model ObjectMetaDataExtention {
-  id                Int @id @default(autoincrement())
+  id                Int    @id @default(autoincrement())
   objectMetaDataId  String @unique
   rawDataPath       String
   objectMetaData    ObjectMetaData @relation(fields: [objectMetaDataId], references: [id])
@@ -46,6 +46,5 @@ model HostIps {
   id             Int @id @default(autoincrement())
   host           String
   objectId       String
-
   object         ObjectMetaData @relation(fields: [objectId], references: [id])
 }
